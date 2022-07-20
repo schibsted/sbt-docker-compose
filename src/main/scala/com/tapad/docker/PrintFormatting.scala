@@ -1,13 +1,12 @@
 package com.tapad.docker
 
-import sbt._
-import scala.Console._
-import scala.collection.Iterable
-import com.tapad.docker.DockerComposeKeys._
+import sbt.*
+import scala.Console.*
+import com.tapad.docker.DockerComposeKeys.*
 
 trait PrintFormatting extends SettingsHelper {
   // Allows for standard print statements to be inspected for test purposes
-  def print(s: String) = println(s)
+  def print(s: String): Unit = println(s)
 
   def printBold(input: String, suppressColor: Boolean): Unit = {
     if (suppressColor) {
@@ -49,8 +48,7 @@ trait PrintFormatting extends SettingsHelper {
       "Image Source",
       "Container Port",
       "Container Id",
-      "IsDebug"
-    )
+      "IsDebug")
     val sortedTableEntries = rows
       .toList
       .sorted
@@ -91,9 +89,7 @@ trait PrintFormatting extends SettingsHelper {
             service.versionTag, service.imageSource,
             "<none>",
             service.containerId,
-            false
-          )
-        )
+            false))
       } else {
         service.ports.map { port =>
           OutputTableRow(
@@ -103,8 +99,7 @@ trait PrintFormatting extends SettingsHelper {
             service.imageSource,
             port.containerPort,
             service.containerId,
-            port.isDebug
-          )
+            port.isDebug)
         }
       }
     }

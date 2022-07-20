@@ -1,10 +1,11 @@
-import com.tapad.docker.{ RunningInstanceInfo, DockerComposePluginLocal }
-import com.tapad.docker.DockerComposeKeys._
-import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{ BeforeAndAfter, FunSuite, OneInstancePerTest }
+import com.tapad.docker.{ DockerComposePluginLocal, RunningInstanceInfo }
+import com.tapad.docker.DockerComposeKeys.*
+import org.mockito.Mockito.*
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.{ BeforeAndAfter, OneInstancePerTest }
+import org.scalatestplus.mockito.MockitoSugar
 
-class InstancePersistenceSpec extends FunSuite with BeforeAndAfter with OneInstancePerTest with MockitoSugar {
+class InstancePersistenceSpec extends AnyFunSuite with BeforeAndAfter with OneInstancePerTest with MockitoSugar {
 
   test("Validate that only running instances from this sbt session are returned") {
     val instanceMock = spy(new DockerComposePluginLocal)

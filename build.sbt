@@ -8,22 +8,15 @@ name := "sbt-docker-compose"
 
 organization := "com.tapad"
 
-scalaVersion := "2.10.6"
-
-crossSbtVersions := Seq("0.13.16", "1.0.0")
-
-libraryDependencies += {
-  val liftJsonVersion = CrossVersion.partialVersion(scalaVersion.value) match {
-    case Some((2, n)) if n < 12 => "2.5.4"
-    case _ => "3.0.1"
-  }
-  "net.liftweb" %% "lift-json" % liftJsonVersion
-}
+scalaVersion := "2.12.16"
 
 libraryDependencies ++= Seq(
-  "org.yaml" % "snakeyaml" % "1.15",
-  "org.scalatest" %% "scalatest" % "3.0.1" % "test",
-  "org.mockito" % "mockito-all" % "1.9.5" % "test")
+  "net.liftweb" %% "lift-json" % "3.5.0",
+  "org.scalatest" %% "scalatest" % "3.2.12" % Test,
+  "org.scalatestplus" %% "mockito-4-5" % "3.2.12.0" % Test,
+  "org.yaml" % "snakeyaml" % "1.30",
+  "org.mockito" % "mockito-all" % "1.10.19" % Test
+)
 
 publishTo := {
   val nexus = "https://oss.sonatype.org"
@@ -33,11 +26,9 @@ publishTo := {
     Some("releases" at s"$nexus/service/local/staging/deploy/maven2")
 }
 
-useGpg := true
-
 publishMavenStyle := true
 
-publishArtifact in Test := false
+Test / publishArtifact := false
 
 pomIncludeRepository := { _ => false }
 
@@ -62,9 +53,7 @@ pomExtra := {
     </developers>
   }
 
-scalariformSettings
-
-releaseNextVersion := { (version: String) => Version(version).map(_.bumpBugfix.asSnapshot.string).getOrElse(versionFormatError) }
+import scalariform.formatter.preferences._
 
 releaseProcess := Seq(
   checkSnapshotDependencies,

@@ -1,9 +1,10 @@
-import com.tapad.docker.DockerComposePlugin._
-import com.tapad.docker.{ ServiceInfo, DockerComposePluginLocal }
-import org.mockito.Mockito._
-import org.scalatest.{ OneInstancePerTest, BeforeAndAfter, FunSuite }
+import com.tapad.docker.DockerComposePlugin.*
+import com.tapad.docker.{ DockerComposePluginLocal, ServiceInfo }
+import org.mockito.Mockito.*
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.{ BeforeAndAfter, OneInstancePerTest }
 
-class ImagePullingSpec extends FunSuite with BeforeAndAfter with OneInstancePerTest {
+class ImagePullingSpec extends AnyFunSuite with BeforeAndAfter with OneInstancePerTest {
   test("Validate that when the 'skipPull' argument is passed in no imaged are pull from the Docker registry") {
     val instanceMock = new DockerComposePluginLocal with MockOutput
 

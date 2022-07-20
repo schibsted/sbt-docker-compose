@@ -1,8 +1,8 @@
 package com.tapad.docker
 
-import sbt._
+import sbt.*
 import scala.sys.process.Process
-import com.tapad.docker.DockerComposeKeys._
+import com.tapad.docker.DockerComposeKeys.*
 
 trait DockerCommands {
   def dockerComposeUp(instanceName: String, composePath: String): Int = {
@@ -89,7 +89,7 @@ trait DockerCommands {
    * If running on Boot2Docker environment on OSX use the machine IP else use the container host
    * @return True if Boot2Docker, Otherwise False
    */
-  def isBoot2DockerEnvironment: Boolean = sys.env.get("DOCKER_MACHINE_NAME").isDefined
+  def isBoot2DockerEnvironment: Boolean = sys.env.contains("DOCKER_MACHINE_NAME")
 
   /**
    * Builds a docker image for an sbt project using the user defined task.
