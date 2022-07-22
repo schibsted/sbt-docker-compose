@@ -1,11 +1,9 @@
 package com.tapad.docker
 
-import java.io._
+import com.tapad.docker.DockerComposeKeys.*
+import sbt.State
 
-import com.tapad.docker.DockerComposeKeys._
-import sbt.{ State, _ }
-
-import scala.collection.Seq
+import java.io.*
 import scala.util.Try
 
 /**
@@ -14,7 +12,7 @@ import scala.util.Try
  */
 trait ComposeInstancePersistence extends SettingsHelper {
   val settingsFileName = "dockerComposeInstances.bin"
-  val settingsFile = if (new File("/tmp").exists) {
+  val settingsFile: String = if (new File("/tmp").exists) {
     s"/tmp/$settingsFileName"
   } else {
     s"${System.getProperty("java.io.tmpdir")}$settingsFileName"
@@ -36,11 +34,11 @@ trait ComposeInstancePersistence extends SettingsHelper {
           Try {
             if (new File(settingsFile).exists) {
               val ois = new ObjectInputStream(new FileInputStream(settingsFile)) {
-                override def resolveClass(desc: ObjectStreamClass): Class[_] = {
+                override def resolveClass(desc: ObjectStreamClass): Class[?] = {
                   try {
                     Class.forName(desc.getName, false, getClass.getClassLoader)
                   } catch {
-                    case ex: ClassNotFoundException => super.resolveClass(desc)
+                    case _: ClassNotFoundException => super.resolveClass(desc)
                   }
                 }
               }

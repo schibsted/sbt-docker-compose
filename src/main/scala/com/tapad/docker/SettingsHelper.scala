@@ -1,8 +1,6 @@
 package com.tapad.docker
 
-import sbt._
-
-import scala.collection.Seq
+import sbt.*
 
 /**
  * Access all SBT project settings and attributes through this trait so that the values can be mocked under test

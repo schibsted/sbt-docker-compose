@@ -1,10 +1,11 @@
-import sbt._
+import sbt.*
 import com.tapad.docker.{ DockerComposePluginLocal, RunningInstanceInfo, Version }
-import org.mockito.Matchers._
-import org.mockito.Mockito._
-import org.scalatest.{ BeforeAndAfter, FunSuite, OneInstancePerTest }
+import org.mockito.Matchers.*
+import org.mockito.Mockito.*
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.{ BeforeAndAfter, OneInstancePerTest }
 
-class ComposeInstancesSpec extends FunSuite with BeforeAndAfter with OneInstancePerTest with MockHelpers {
+class ComposeInstancesSpec extends AnyFunSuite with BeforeAndAfter with OneInstancePerTest with MockHelpers {
   test("Validate that no instances are printed when none are running") {
     val composeMock = spy(new DockerComposePluginLocal)
     val serviceName = "matchingservice"

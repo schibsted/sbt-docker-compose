@@ -1,7 +1,8 @@
-import com.tapad.docker.DockerComposePlugin._
-import org.scalatest.{ BeforeAndAfter, FunSuite, OneInstancePerTest }
+import com.tapad.docker.DockerComposePlugin.*
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.{ BeforeAndAfter, OneInstancePerTest }
 
-class TagProcessingSpec extends FunSuite with BeforeAndAfter with OneInstancePerTest {
+class TagProcessingSpec extends AnyFunSuite with BeforeAndAfter with OneInstancePerTest {
 
   val imageNoTag = "testImage"
   val imageLatestTag = "testImage:latest"

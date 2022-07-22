@@ -3,31 +3,28 @@ package com.tapad.docker
 import com.tapad.docker.DockerComposeKeys.{ suppressColorFormatting, testCasesJar, testTagsToExecute }
 import sbt.State
 
-import scala.collection.Seq
-
 /**
  * Represents the settings/input given to produce a test command-line.
  */
 case class ExecuteInput(
-    runner: ComposeTestRunner,
-    testDependencyClasspath: String,
-    testParamsList: Seq[String],
-    debugSettings: String
-)(implicit
+  runner: ComposeTestRunner,
+  testDependencyClasspath: String,
+  testParamsList: Seq[String],
+  debugSettings: String)(implicit
   val state: State,
-    val args: Seq[String],
-    val instance: Option[RunningInstanceInfo]) {
-  def matches(regex: String) = testDependencyClasspath.matches(regex)
+  val args: Seq[String],
+  val instance: Option[RunningInstanceInfo]) {
+  def matches(regex: String): Boolean = testDependencyClasspath.matches(regex)
 
-  def testArgs = runner.getSetting(DockerComposeKeys.testExecutionArgs).split(" ").toSeq
+  def testArgs: Seq[String] = runner.getSetting(DockerComposeKeys.testExecutionArgs).split(" ").toSeq
 
-  def suppressColor = runner.getSetting(suppressColorFormatting)
+  def suppressColor: Boolean = runner.getSetting(suppressColorFormatting)
 
-  def formattedClasspath = {
+  def formattedClasspath: String = {
     testDependencyClasspath.split("[;:,]", -1).mkString("\n")
   }
 
-  override def toString = {
+  override def toString: String = {
     s"""Docker Compose Test Input:
        |testParamsList: $testParamsList
        |debugSettings: $debugSettings

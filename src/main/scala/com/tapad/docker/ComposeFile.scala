@@ -1,18 +1,16 @@
 package com.tapad.docker
 
+import com.tapad.docker.DockerComposeKeys.*
+import org.yaml.snakeyaml.Yaml
+import sbt.*
+
 import java.io.{ File, FileWriter }
 import java.util
 import java.util.regex.{ Matcher, Pattern }
-
-import com.tapad.docker.DockerComposeKeys._
-import org.yaml.snakeyaml.Yaml
-import sbt.Keys._
-import sbt._
-
-import scala.collection.JavaConverters._
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters.*
+import scala.collection.convert.ImplicitConversions.`map AsScala`
 import scala.collection.{ Iterable, Seq }
-import scala.io.Source._
+import scala.io.Source.*
 import scala.util.{ Failure, Success, Try }
 
 trait ComposeFile extends SettingsHelper with ComposeCustomTagHelpers with PrintFormatting {
@@ -37,7 +35,7 @@ trait ComposeFile extends SettingsHelper with ComposeCustomTagHelpers with Print
   val environmentDebugKey = "JAVA_TOOL_OPTIONS"
 
   //List of docker-compose fields that are currently unsupported by the plugin
-  val unsupportedFields = List("build", "container_name", "extends")
+  val unsupportedFields: Seq[String] = List("build", "container_name", "extends")
 
   type yamlData = Map[String, java.util.LinkedHashMap[String, Any]]
 
@@ -90,7 +88,7 @@ trait ComposeFile extends SettingsHelper with ComposeCustomTagHelpers with Print
           case e: String =>
             val updated = getFullyQualifiedPath(e, composeFileDir)
             serviceData.put(envFileKey, updated)
-          case e: util.ArrayList[_] =>
+          case e: util.ArrayList[?] =>
             val updated = e.asScala.map(file => getFullyQualifiedPath(file.asInstanceOf[String], composeFileDir))
             serviceData.put(envFileKey, updated.asJava)
         }
@@ -102,15 +100,13 @@ trait ComposeFile extends SettingsHelper with ComposeCustomTagHelpers with Print
         val composeFileDir = composeFileFullPath.substring(0, composeFileFullPath.lastIndexOf(File.separator))
 
         val volumes = serviceData.get(volumesKey).asInstanceOf[util.List[String]].asScala
-        val updated = volumes.map { volume =>
-          volume match {
-            case relativeVolume if relativeVolume.startsWith(".") =>
-              val Array(relativeLocalPath, mountPath) = relativeVolume.split(":", 2)
-              val fullyQualifiedLocalPath = getFullyQualifiedPath(relativeLocalPath, composeFileDir)
-              s"$fullyQualifiedLocalPath:$mountPath"
-            case nonRelativeVolume =>
-              nonRelativeVolume
-          }
+        val updated = volumes.map {
+          case relativeVolume if relativeVolume.startsWith(".") =>
+            val Array(relativeLocalPath, mountPath) = relativeVolume.split(":", 2)
+            val fullyQualifiedLocalPath = getFullyQualifiedPath(relativeLocalPath, composeFileDir)
+            s"$fullyQualifiedLocalPath:$mountPath"
+          case nonRelativeVolume =>
+            nonRelativeVolume
         }
         serviceData.put(volumesKey, updated.asJava)
       }
@@ -132,7 +128,7 @@ trait ComposeFile extends SettingsHelper with ComposeCustomTagHelpers with Print
           (portInfo, portMapping)
       }.unzip
 
-      serviceData.put(portsKey, new util.ArrayList[String](updatedPortList))
+      serviceData.put(portsKey, updatedPortList.asJava)
 
       ServiceInfo(serviceName, updatedImageName, imageSource, updatedPortInfo)
     }
@@ -191,7 +187,7 @@ trait ComposeFile extends SettingsHelper with ComposeCustomTagHelpers with Print
 
   def getComposeVersion(composeYaml: yamlData): Int = {
     composeYaml.get(servicesKey) match {
-      case Some(services) => 2
+      case Some(_) => 2
       case None => 1
     }
   }
@@ -254,11 +250,11 @@ trait ComposeFile extends SettingsHelper with ComposeCustomTagHelpers with Print
       val debugPort = if (serviceKeys.containsKey(environmentKey)) {
         val debugAddress = {
           serviceKeys.get(environmentKey) match {
-            case key: util.LinkedHashMap[_, _] =>
+            case key: util.LinkedHashMap[?, ?] =>
               val env = key.asInstanceOf[java.util.LinkedHashMap[String, String]].asScala
               val debugOptions = env.filter(_._1 == environmentDebugKey)
               debugOptions.flatMap(_._2.split(','))
-            case key: util.ArrayList[_] =>
+            case key: util.ArrayList[?] =>
               val env = key.asInstanceOf[util.ArrayList[String]].asScala
               val debugOptions = env.filter(_.startsWith(environmentDebugKey))
               debugOptions.flatMap(_.split(','))
@@ -302,7 +298,7 @@ trait ComposeFile extends SettingsHelper with ComposeCustomTagHelpers with Print
         if (useStatic)
           getStaticPortMappings(ports)
         else
-          new java.util.ArrayList[String](ports)
+          new java.util.ArrayList[String](ports.asJava)
       }
 
       serviceKeys.put(portsKey, list)
@@ -312,7 +308,7 @@ trait ComposeFile extends SettingsHelper with ComposeCustomTagHelpers with Print
         val (hostPort, containerPort) = if (portArray.length == 2) (portArray(0), portArray(1)) else (portArray(0), portArray(0))
         val debugMatch = portArray.contains(debugPort)
         PortInfo(hostPort, containerPort, debugMatch)
-      }).toList, list.toList)
+      }).toList, list.asScala.toList)
     } else {
       (List.empty, List.empty)
     }
@@ -327,11 +323,16 @@ trait ComposeFile extends SettingsHelper with ComposeCustomTagHelpers with Print
       case Pattern2(port, protocol) => s"$port:$port$protocol"
       case otherwise => otherwise
     }
-    new java.util.ArrayList[String](staticPorts)
+    new java.util.ArrayList[String](staticPorts.asJava)
   }
 
   def readComposeFile(composePath: String, variables: Vector[(String, String)] = Vector.empty): yamlData = {
-    val yamlString = fromFile(composePath).getLines().mkString("\n")
+    val yamlString = {
+      val file = fromFile(composePath)
+      val lines = file.getLines().mkString("\n")
+      file.close()
+      lines
+    }
     val yamlUpdated = processVariableSubstitution(yamlString, variables)
 
     new Yaml().load(yamlUpdated).asInstanceOf[java.util.Map[String, java.util.LinkedHashMap[String, Any]]].asScala.toMap
@@ -367,8 +368,8 @@ trait ComposeFile extends SettingsHelper with ComposeCustomTagHelpers with Print
 
   def deleteComposeFile(composePath: String): Boolean = {
     Try(new File(composePath).delete()) match {
-      case Success(i) => true
-      case Failure(t) => false
+      case Success(_) => true
+      case Failure(_) => false
     }
   }
 

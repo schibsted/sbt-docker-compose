@@ -1,14 +1,14 @@
-import com.tapad.docker.DockerComposeKeys._
-import com.tapad.docker.DockerComposePlugin._
-import com.tapad.docker._
-import org.mockito.Mockito._
-import org.scalatest.mockito.MockitoSugar
-import org.scalatest.{ BeforeAndAfter, FunSuite, OneInstancePerTest }
+import com.tapad.docker.DockerComposeKeys.*
+import com.tapad.docker.DockerComposePlugin.*
+import com.tapad.docker.*
+import org.mockito.Mockito.*
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.{ BeforeAndAfter, OneInstancePerTest }
+import org.scalatestplus.mockito.MockitoSugar
 
-import scala._
-import scala.io._
+import scala.io.*
 
-class PluginGeneralSpec extends FunSuite with BeforeAndAfter with OneInstancePerTest with MockitoSugar {
+class PluginGeneralSpec extends AnyFunSuite with BeforeAndAfter with OneInstancePerTest with MockitoSugar {
 
   test("Validate containsArg function") {
     val plugin = new DockerComposePluginLocal
@@ -102,6 +102,6 @@ class PluginGeneralSpec extends FunSuite with BeforeAndAfter with OneInstancePer
 trait MockOutput extends PrintFormatting {
   var messages: Seq[String] = Seq()
 
-  override def print(s: String) = messages = messages :+ s
-  override def printBold(s: String, noColor: Boolean) = messages = messages :+ s
+  override def print(s: String): Unit = messages = messages :+ s
+  override def printBold(s: String, noColor: Boolean): Unit = messages = messages :+ s
 }
