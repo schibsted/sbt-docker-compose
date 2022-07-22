@@ -46,6 +46,11 @@ trait DockerCommands {
     Process(s"""docker ps --all --filter=name=${instanceName.replace('/', '_')}_${serviceName}_ --format=\"{{.ID}}\"""").!!.trim().replaceAll("\"", "")
   }
 
+  def getDockerContainerId2(instanceName: String, serviceName: String): String = {
+    //Docker replaces '/' with '_' in the identifier string so search for replaced version
+    Process(s"""docker ps --all --filter=name=${instanceName.replace('/', '_')}-${serviceName}- --format=\"{{.ID}}\"""").!!.trim().replaceAll("\"", "")
+  }
+
   def getDockerContainerInfo(containerId: String): String = {
     Process(s"docker inspect --type=container $containerId").!!
   }
